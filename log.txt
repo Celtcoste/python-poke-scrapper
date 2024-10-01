@@ -1,0 +1,273 @@
+Connection to MySQL DB successful
+Already scrapped Card:  base1-1  -  Alakazam
+Already scrapped Card:  base1-2  -  Tortank
+Already scrapped Card:  base1-3  -  Leveinard
+Already scrapped Card:  base1-4  -  Dracaufeu
+Already scrapped Card:  base1-5  -  Mélofée
+Already scrapped Card:  base1-6  -  Léviator
+Already scrapped Card:  base1-7  -  Tygnon
+Already scrapped Card:  base1-8  -  Mackogneur
+Already scrapped Card:  base1-9  -  Magneton
+Already scrapped Card:  base1-10  -  Mewtwo
+Already scrapped Card:  base1-11  -  Nidoking
+Already scrapped Card:  base1-12  -  Feunard
+Already scrapped Card:  base1-13  -  Tartard
+Already scrapped Card:  base1-14  -  Raichu
+Already scrapped Card:  base1-15  -  Florizarre
+Already scrapped Card:  base1-16  -  Électhor
+Already scrapped Card:  base1-17  -  Dardargnan
+Already scrapped Card:  base1-18  -  Draco
+Already scrapped Card:  base1-19  -  Triopikeur
+Already scrapped Card:  base1-20  -  Élektek
+Already scrapped Card:  base1-21  -  Électrode
+Already scrapped Card:  base1-22  -  Roucoups
+Already scrapped Card:  base1-23  -  Arcanin
+Already scrapped Card:  base1-24  -  Reptincel
+Already scrapped Card:  base1-25  -  Lamantine
+Already scrapped Card:  base1-26  -  Minidraco
+Already scrapped Card:  base1-27  -  Canarticho
+Already scrapped Card:  base1-28  -  Caninos
+Already scrapped Card:  base1-29  -  Spectrum
+Already scrapped Card:  base1-30  -  Herbizarre
+Already scrapped Card:  base1-31  -  Lippoutou
+Already scrapped Card:  base1-32  -  Kadabra
+Already scrapped Card:  base1-33  -  Coconfort
+Already scrapped Card:  base1-34  -  Machopeur
+Already scrapped Card:  base1-35  -  Magicarpe
+Already scrapped Card:  base1-36  -  Magmar
+Already scrapped Card:  base1-37  -  Nidorino
+Already scrapped Card:  base1-38  -  Têtarte
+Already scrapped Card:  base1-39  -  Porygon
+Already scrapped Card:  base1-40  -  Rattatac
+Already scrapped Card:  base1-41  -  Otaria
+Already scrapped Card:  base1-42  -  Carabaffe
+Already scrapped Card:  base1-43  -  Abra
+Already scrapped Card:  base1-44  -  Bulbizarre
+Already scrapped Card:  base1-45  -  Chenipan
+Already scrapped Card:  base1-46  -  Salamèche
+Already scrapped Card:  base1-47  -  Taupiqueur
+Already scrapped Card:  base1-48  -  Doduo
+Already scrapped Card:  base1-49  -  Soporifik
+Already scrapped Card:  base1-50  -  Fantominus
+Already scrapped Card:  base1-51  -  Smogo
+Already scrapped Card:  base1-52  -  Machoc
+Already scrapped Card:  base1-53  -  Magneti
+Already scrapped Card:  base1-54  -  Chrysacier
+Already scrapped Card:  base1-55  -  Nidoran ♂
+Already scrapped Card:  base1-56  -  Onix
+Already scrapped Card:  base1-57  -  Roucool
+Already scrapped Card:  base1-58  -  Pikachu
+Already scrapped Card:  base1-59  -  Ptitard
+Already scrapped Card:  base1-60  -  Ponyta
+Already scrapped Card:  base1-61  -  Rattata
+Already scrapped Card:  base1-62  -  Sabelette
+Already scrapped Card:  base1-63  -  Carapuce
+Already scrapped Card:  base1-64  -  Staross
+Already scrapped Card:  base1-65  -  Stari
+Already scrapped Card:  base1-66  -  Saquedeneu
+Already scrapped Card:  base1-67  -  Voltorbe
+Already scrapped Card:  base1-68  -  Goupix
+Already scrapped Card:  base1-69  -  Aspicot
+Already scrapped Card:  base1-70  -  Peluche Mélofée
+Already scrapped Card:  base1-71  -  Recherche informatique
+Already scrapped Card:  base1-72  -  Vaporisateur rétrograde
+Already scrapped Card:  base1-73  -  Faux Professeur Chen
+Already scrapped Card:  base1-74  -  Récupérateur
+Already scrapped Card:  base1-75  -  Fillette
+Already scrapped Card:  base1-76  -  Éleveur de Pokémon
+Already scrapped Card:  base1-77  -  Marchand de Pokémon
+Already scrapped Card:  base1-78  -  Rappel
+Already scrapped Card:  base1-79  -  Double Suppression d'Énergie
+Already scrapped Card:  base1-80  -  Defender
+Already scrapped Card:  base1-81  -  Sauvegarde d'Énergie
+Already scrapped Card:  base1-82  -  Guérison Totale
+Already scrapped Card:  base1-83  -  Entretien
+Already scrapped Card:  base1-84  -  PlusPower
+Already scrapped Card:  base1-85  -  Centre Pokémon
+Already scrapped Card:  base1-86  -  Flûte Pokémon
+Already scrapped Card:  base1-87  -  Pokédex
+Already scrapped Card:  base1-88  -  Professeur Chen
+Already scrapped Card:  base1-89  -  Réanimation
+Already scrapped Card:  base1-90  -  Super Potion
+Already scrapped Card:  base1-91  -  Léo
+Already scrapped Card:  base1-92  -  Suppression d'Énergie
+Already scrapped Card:  base1-93  -  Rafale de vent
+Already scrapped Card:  base1-94  -  Potion
+Already scrapped Card:  base1-95  -  Transfert
+{'category': 'Énergie', 'id': 'base1-96', 'illustrator': 'Keiji Kinebuchi', 'image': 'https://assets.tcgdex.net/fr/base/base1/96', 'localId': '96', 'name': 'Double Énergie Incolore', 'rarity': 'Peu Commune', 'set': {'cardCount': {'official': 102, 'total': 102}, 'id': 'base1', 'name': 'Set de Base'}, 'variants': {'firstEdition': False, 'holo': True, 'normal': True, 'reverse': True, 'wPromo': False}, 'energyType': 'Spécial', 'legal': {'standard': False, 'expanded': False}, 'updated': '2023-12-06T00:47:28+01:00'}
+Scrapped card:  base1-96  -  Double Énergie Incolore
+Already scrapped Card:  base1-97  -  Énergie Combat
+Already scrapped Card:  base1-98  -  Énergie Feu
+Already scrapped Card:  base1-99  -  Énergie Plante
+Already scrapped Card:  base1-100  -  Énergie Électrique
+Already scrapped Card:  base1-101  -  Énergie Psy
+Already scrapped Card:  base1-102  -  Énergie Eau
+Already scrapped Card:  base2-1  -  Mélodelfe
+Already scrapped Card:  base2-2  -  Électrode
+Already scrapped Card:  base2-3  -  Pyroli
+Already scrapped Card:  base2-4  -  Voltali
+Already scrapped Card:  base2-5  -  Kangourex
+Already scrapped Card:  base2-6  -  M. Mime
+Already scrapped Card:  base2-7  -  Nidoqueen
+Already scrapped Card:  base2-8  -  Roucarnage
+Already scrapped Card:  base2-9  -  Scarabrute
+Already scrapped Card:  base2-10  -  Insécateur
+Already scrapped Card:  base2-11  -  Ronflex
+Already scrapped Card:  base2-12  -  Aquali
+Already scrapped Card:  base2-13  -  Aéromite
+Already scrapped Card:  base2-14  -  Empiflor
+Already scrapped Card:  base2-15  -  Raflésia
+Already scrapped Card:  base2-16  -  Grodoudou
+Already scrapped Card:  base2-17  -  Mélodelfe
+Already scrapped Card:  base2-18  -  Électrode
+Already scrapped Card:  base2-19  -  Pyroli
+Already scrapped Card:  base2-20  -  Voltali
+Already scrapped Card:  base2-21  -  Kangourex
+Already scrapped Card:  base2-22  -  M. Mime
+Already scrapped Card:  base2-23  -  Nidoqueen
+Already scrapped Card:  base2-24  -  Roucarnage
+Already scrapped Card:  base2-25  -  Scarabrute
+Already scrapped Card:  base2-26  -  Insécateur
+Already scrapped Card:  base2-27  -  Ronflex
+Already scrapped Card:  base2-28  -  Aquali
+Already scrapped Card:  base2-29  -  Aéromite
+Already scrapped Card:  base2-30  -  Empiflor
+Already scrapped Card:  base2-31  -  Raflésia
+Already scrapped Card:  base2-32  -  Grodoudou
+Already scrapped Card:  base2-33  -  Papilusion
+Already scrapped Card:  base2-34  -  Dodrio
+Already scrapped Card:  base2-35  -  Noadkoko
+Already scrapped Card:  base2-36  -  Rapasdepic
+Already scrapped Card:  base2-37  -  Ortide
+Already scrapped Card:  base2-38  -  Excelangue
+Already scrapped Card:  base2-39  -  Ossatueur
+Already scrapped Card:  base2-40  -  Nidorina
+Already scrapped Card:  base2-41  -  Parasect
+Already scrapped Card:  base2-42  -  Persian
+Already scrapped Card:  base2-43  -  Colossinge
+Already scrapped Card:  base2-44  -  Galopa
+Already scrapped Card:  base2-45  -  Rhinoféros
+Already scrapped Card:  base2-46  -  Poissoroy
+Already scrapped Card:  base2-47  -  Tauros
+Already scrapped Card:  base2-48  -  Boustiflor
+Already scrapped Card:  base2-49  -  Chétiflor
+Already scrapped Card:  base2-50  -  Osselait
+Already scrapped Card:  base2-51  -  Évoli
+Already scrapped Card:  base2-52  -  Nœufnœuf
+Already scrapped Card:  base2-53  -  Poissirène
+Already scrapped Card:  base2-54  -  Rondoudou
+Already scrapped Card:  base2-55  -  Férosinge
+Already scrapped Card:  base2-56  -  Miaouss
+Already scrapped Card:  base2-57  -  Nidoran ♀
+Already scrapped Card:  base2-58  -  Mystherbe
+Already scrapped Card:  base2-59  -  Paras
+Already scrapped Card:  base2-60  -  Pikachu
+Already scrapped Card:  base2-61  -  Rhinocorne
+Already scrapped Card:  base2-62  -  Piafabec
+Already scrapped Card:  base2-63  -  Mimitoss
+Already scrapped Card:  base2-64  -  Poké Balle
+Already scrapped Card:  basep-2  -  Electabuzz
+Already scrapped Card:  basep-3  -  Deuxmiaou
+Already scrapped Card:  basep-4  -  Pikachu
+Already scrapped Card:  basep-5  -  Dragonite
+Already scrapped Card:  basep-6  -  Arcanin
+Already scrapped Card:  basep-8  -  Mew
+Already scrapped Card:  basep-9  -  Mew
+Already scrapped Card:  basep-14  -  Mewtwo
+Already scrapped Card:  basep-20  -  Psykokwak
+Already scrapped Card:  basep-21  -  Sulfura
+Already scrapped Card:  basep-22  -  Artikodin
+Already scrapped Card:  basep-23  -  Électhor
+Already scrapped Card:  basep-24  -  Pikachu de ________
+Already scrapped Card:  basep-25  -  Pikachu volant
+Already scrapped Card:  basep-26  -  Pikachu
+Already scrapped Card:  basep-28  -  Pikachu surfeur
+Already scrapped Card:  basep-29  -  Marill
+Already scrapped Card:  basep-30  -  Togepi
+Already scrapped Card:  basep-31  -  Mélo
+Already scrapped Card:  basep-32  -  Queulorior
+Already scrapped Card:  basep-33  -  Cizayox
+Already scrapped Card:  basep-35  -  Pichu
+Already scrapped Card:  basep-36  -  Toudoudou
+Already scrapped Card:  basep-37  -  Kapoera
+Already scrapped Card:  basep-38  -  Zarbi J
+Already scrapped Card:  basep-39  -  Feuforêve
+Already scrapped Card:  base3-1  -  Ptera
+Already scrapped Card:  base3-2  -  Artikodin
+Already scrapped Card:  base3-3  -  Metamorph
+Already scrapped Card:  base3-4  -  Dracolosse
+Already scrapped Card:  base3-5  -  Ectoplasma
+Already scrapped Card:  base3-6  -  Spectrum
+Already scrapped Card:  base3-7  -  Kicklee
+Already scrapped Card:  base3-8  -  Hypnomade
+Already scrapped Card:  base3-9  -  Kabutops
+Already scrapped Card:  base3-10  -  Lokhlass
+Already scrapped Card:  base3-11  -  Magneton
+Already scrapped Card:  base3-12  -  Sulfura
+Already scrapped Card:  base3-13  -  Grotadmorv
+Already scrapped Card:  base3-14  -  Raichu
+Already scrapped Card:  base3-15  -  Élector
+Already scrapped Card:  base3-16  -  Ptera
+Already scrapped Card:  base3-17  -  Artikodin
+Already scrapped Card:  base3-18  -  Metamorph
+Already scrapped Card:  base3-19  -  Dracolosse
+Already scrapped Card:  base3-20  -  Ectoplasma
+Already scrapped Card:  base3-21  -  Spectrum
+Already scrapped Card:  base3-22  -  Kicklee
+Already scrapped Card:  base3-23  -  Hypnomade
+Already scrapped Card:  base3-24  -  Kabutops
+Already scrapped Card:  base3-25  -  Lokhlass
+Already scrapped Card:  base3-26  -  Magneton
+Already scrapped Card:  base3-27  -  Sulfura
+Already scrapped Card:  base3-28  -  Grotadmorv
+Already scrapped Card:  base3-29  -  Raichu
+Already scrapped Card:  base3-30  -  Élector
+Already scrapped Card:  base3-31  -  Arbok
+Already scrapped Card:  base3-32  -  Crustabri
+Already scrapped Card:  base3-33  -  Fantominus
+Already scrapped Card:  base3-34  -  Nosferalto
+Already scrapped Card:  base3-35  -  Akwakwak
+Already scrapped Card:  base3-36  -  Grolem
+Already scrapped Card:  base3-37  -  Gravalanch
+Already scrapped Card:  base3-38  -  Krabboss
+Already scrapped Card:  base3-39  -  Magmar
+Already scrapped Card:  base3-40  -  Amonistar
+Already scrapped Card:  base3-41  -  Sablaireau
+Already scrapped Card:  base3-42  -  Hypocéan
+Already scrapped Card:  base3-43  -  Flagadoss
+Already scrapped Card:  base3-44  -  Tentacruel
+Already scrapped Card:  base3-45  -  Smogogo
+Already scrapped Card:  base3-46  -  Abo
+Already scrapped Card:  base3-47  -  Racaillou
+Already scrapped Card:  base3-48  -  Tadmorv
+Already scrapped Card:  base3-49  -  Hypotrempe
+Already scrapped Card:  base3-50  -  Kabuto
+Already scrapped Card:  base3-51  -  Krabby
+Already scrapped Card:  base3-52  -  Amonita
+Already scrapped Card:  base3-53  -  Psykokwak
+Already scrapped Card:  base3-54  -  Kokiyas
+Already scrapped Card:  base3-55  -  Ramoloss
+Already scrapped Card:  base3-56  -  Tentacool
+Already scrapped Card:  base3-57  -  Nosferapti
+Already scrapped Card:  base3-58  -  M. Fuji
+Already scrapped Card:  base3-59  -  Recherche d'Énergie
+Already scrapped Card:  base3-60  -  Joueur
+Already scrapped Card:  base3-61  -  Recyclage
+Already scrapped Card:  base3-62  -  Mystérieux Fossile
+Already scrapped Card:  base5-1  -  Alakazam obscur
+Already scrapped Card:  base5-2  -  Arbok obscur
+Already scrapped Card:  base5-3  -  Tortank obscur
+Already scrapped Card:  base5-4  -  Dracaufeu obscur
+Already scrapped Card:  base5-5  -  Dracolosse obscur
+Already scrapped Card:  base5-6  -  Triopikeur obscur
+Already scrapped Card:  base5-7  -  Nosferalto obscur
+Already scrapped Card:  base5-8  -  Léviator obscur
+Already scrapped Card:  base5-9  -  Hypnomade obscur
+Already scrapped Card:  base5-10  -  Mackogneur obscur
+Already scrapped Card:  base5-11  -  Magneton obscur
+Already scrapped Card:  base5-12  -  Flagadoss obscur
+Already scrapped Card:  base5-13  -  Rafflesia obscur
+Already scrapped Card:  base5-14  -  Smogogo obscur
+Already scrapped Card:  base5-15  -  Et voila les Team Rocket !
+Already scrapped Card:  base5-16  -  Attaque sournoise des Rocket
+{'category': 'Énergie', 'id': 'base5-17', 'illustrator': 'Takumi Akabane', 'image': 'https://assets.tcgdex.net/fr/base/base5/17', 'localId': '17', 'name': 'Énergie multicolore', 'rarity': 'Rare', 'set': {'cardCount': {'official': 82, 'total': 83}, 'id': 'base5', 'name': 'Team Rocket', 'symbol': 'https://assets.tcgdex.net/univ/base/base5/symbol'}, 'variants': {'firstEdition': False, 'holo': True, 'normal': True, 'reverse': True, 'wPromo': False}, 'legal': {'standard': False, 'expanded': False}, 'updated': '2023-12-06T00:47:28+01:00'}
