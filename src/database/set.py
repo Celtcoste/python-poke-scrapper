@@ -20,7 +20,7 @@ def insert_set_translation(conn, data: SetTranslation):
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "INSERT INTO `set_translation` (id, set_id, name, description, language_id) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
+            "INSERT INTO `serie_translation` (id, serie_id, name, description, language_id) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
             (data.id, data.set_id, data.name, data.description, data.language_id)
         )
         # Valider les changements
@@ -38,7 +38,7 @@ def insert_set(conn, data: Set):
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "INSERT INTO `set` (id, card_number, position, bloc_id) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
+            "INSERT INTO `serie` (id, card_number, position, bloc_id) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
             (data.id, data.card_number, data.position, data.bloc_id)
         )
         # Valider les changements

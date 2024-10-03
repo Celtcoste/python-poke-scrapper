@@ -105,7 +105,7 @@ def insert_card(conn, data: Card):
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "INSERT INTO card (id, position, category_id, rarity_id, set_id, illustrator_id) VALUES (%s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
+            "INSERT INTO card (id, position, category_id, rarity_id, serie_id, illustrator_id) VALUES (%s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
             (data.id, data.position, data.category_id, data.rarity_id, data.set_id, data.illustrator_id)
         )
         # Valider les changements

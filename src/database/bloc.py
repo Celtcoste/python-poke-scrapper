@@ -45,7 +45,7 @@ def insert_bloc(conn, data: Bloc):
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "INSERT INTO bloc (id, tcg_id, set_number, position) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
+            "INSERT INTO bloc (id, tcg_id, serie_number, position) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
             (data.id, data.tcg_id, data.set_number, data.position)
         )
         # Valider les changements

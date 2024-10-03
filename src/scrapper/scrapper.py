@@ -8,7 +8,7 @@ from ..database.illustrator import Illustrator, insert_illustrator
 from ..database.card import Card, PokemonCard, insert_card, insert_card_translation, insert_energy_card, insert_trainer_card, insert_pokemon_card, insert_pokemon_card_element, insert_card_variant, get_card_id, check_energy_card, check_trainer_card, check_pokemon_card
 from ..database.category import get_category_id_by_name
 from ..database.rarity import get_rarity_id_by_name
-from ..database.pokemon import insert_pokemon_if_not_exist
+from ..database.pokemon import insert_pokemon_if_not_exist, get_pokemon_id_by_name
 
 def fetch_data(url):
     response = requests.get(url)
@@ -88,6 +88,8 @@ def scrap_poke_data(connection, lang: str):
                                 continue
                         # Fetch the card data
                         card_data = fetch_data(f"{cards_url}/{card_global_data["id"]}")
+                        if card_data == None:
+                            continue
                         print(card_data)
                         
                         # Add or get the illustrator id
@@ -120,18 +122,30 @@ def scrap_poke_data(connection, lang: str):
                                 # Insert pokemon if not exists
                                 pokemon_id = insert_pokemon_if_not_exist(connection, card_data["dexId"][0], f"{lang}/pokemon/{card_data["dexId"][0]}", card_data["name"], language_ids[lang])
                             else:
-                                dexId = input("Insert dexID for pokemon (" + card_data["name"] + " and " + card_data["id"]+ "): ")
+                                dexId = get_pokemon_id_by_name(connection, card_data["name"].split(' ')[0], language_ids[lang])
+                                if dexId == 0:
+                                    if len(card_data["name"].split(' ')) > 1:
+                                        dexId = get_pokemon_id_by_name(connection, card_data["name"].split(' ')[1], language_ids[lang])
+                                if dexId == 0:
+                                    dexId = get_pokemon_id_by_name(connection, card_data["name"].split('-ex')[0], language_ids[lang])
+                                    if dexId == 0:
+                                        dexId = input("Insert dexID for pokemon (" + card_data["name"] + " and " + card_data["id"]+ "): ")
                                 pokemon_id = insert_pokemon_if_not_exist(connection, dexId, f"{lang}/pokemon/{dexId}", card_data["name"], language_ids[lang])
                             # Insert the pokemon card
                             if card_data.get("level"):
                                 level = card_data["level"]
                             else:
                                 level = 0
-                            pokemon_card_id = insert_pokemon_card(connection, PokemonCard( f"{card_id}/pokemon", card_id, pokemon_id, card_data["hp"], level))
+                            if card_data.get("hp"):
+                                hp = card_data["hp"]
+                            else:
+                                hp = 0
+                            pokemon_card_id = insert_pokemon_card(connection, PokemonCard( f"{card_id}/pokemon", card_id, pokemon_id, hp, level))
                             
-                            # Insert the pokemon card elements
-                            for type in card_data["types"]:
-                                insert_pokemon_card_element(connection, pokemon_card_id, type, language_ids[lang])
+                            if  card_data.get("types"):
+                                # Insert the pokemon card elements
+                                for type in card_data["types"]:
+                                    insert_pokemon_card_element(connection, pokemon_card_id, type, language_ids[lang])
                         else:
                             print("Invalid category:", id_category)
                         
@@ -149,6 +163,6 @@ def scrap_poke_data(connection, lang: str):
 
                         print("Scrapped card: ", card_data["id"], " - ", card_data["name"])
                         # Sleep to avoid overwhelming the API
-                        time.sleep(1)
+                        time.sleep(0.5)
 
             print("Scrapped Bloc: ", bloc_data["name"])
