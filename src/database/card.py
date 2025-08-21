@@ -121,6 +121,11 @@ def build_seo_path(card_name: str, seo_data: dict) -> str:
     # Format: {card_name}-{card_position}-{serie_card_count}-{serie_name}-{bloc_name}-{tcg_language_slug}
     seo_path = f"{clean_card_name}-{seo_data['card_position']}-{seo_data['serie_card_count']}-{clean_serie_name}-{clean_bloc_name}-{clean_tcg_slug}"
     
+    # Replace only the last occurrence of "poke-{lang}" with "pokemon-{lang}" for better SEO
+    # This targets the tcg_language_slug at the end, not card names like "poke-ball"
+    import re
+    seo_path = re.sub(r'-poke-(fr|en|jp)$', r'-pokemon-\1', seo_path)
+    
     return seo_path
 
 def get_card_id_by_slug(conn, slug: str):

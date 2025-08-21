@@ -185,6 +185,9 @@ def scrap_poke_data(connection, lang: str):
                         
                         if card_id is None:
                             error("Failed to create card '%s'. Skipping...", card_slug)
+                            error("Card data received from API: %s", card_data)
+                            error("Card object details: slug='%s', position='%s', category_id=%s, rarity_id=%s, set_id=%s, illustrator_id=%s", 
+                                  card_slug, cleaned_position, id_category, id_rarity, set_id, id_illustrator)
                             continue
                             
                         # Add card translation
@@ -195,7 +198,13 @@ def scrap_poke_data(connection, lang: str):
                         else:
                             description = None
                         card_translation_slug = f"{card_slug}/translation"
-                        insert_card_translation(connection, card_translation_slug, card_id, language_ids[lang], card_data["name"], description)
+                        translation_id = insert_card_translation(connection, card_translation_slug, card_id, language_ids[lang], card_data["name"], description)
+                        
+                        if translation_id is None:
+                            error("Failed to create card translation for card_id=%s", card_id)
+                            error("Card translation data: slug='%s', name='%s', description='%s', language_id=%s", 
+                                  card_translation_slug, card_data["name"], description, language_ids[lang])
+                            error("Original card data: %s", card_data)
                         
                         # Insert the card type
                         debug("Processing card type with category ID: %s", id_category)
@@ -203,16 +212,28 @@ def scrap_poke_data(connection, lang: str):
                         
                         if id_category == CATEGORY_IDS.get('ENERGY', -1):
                             energy_card_slug = f"{card_slug}/energy"
-                            insert_energy_card(connection, energy_card_slug, card_id, card_data["name"], language_ids[lang])
+                            energy_result = insert_energy_card(connection, energy_card_slug, card_id, card_data["name"], language_ids[lang])
+                            if energy_result is None:
+                                error("Failed to create energy card for card_id=%s", card_id)
+                                error("Energy card data: slug='%s', energy_type='%s'", energy_card_slug, card_data["name"])
+                                error("Original card data: %s", card_data)
                         elif id_category == CATEGORY_IDS.get('TRAINER', -1):
                             trainer_card_slug = f"{card_slug}/trainer"
-                            insert_trainer_card(connection, trainer_card_slug, card_id)
+                            trainer_result = insert_trainer_card(connection, trainer_card_slug, card_id)
+                            if trainer_result is None:
+                                error("Failed to create trainer card for card_id=%s", card_id)
+                                error("Trainer card data: slug='%s'", trainer_card_slug)
+                                error("Original card data: %s", card_data)
                         elif id_category == CATEGORY_IDS.get('POKEMON', -1):
                             if card_data.get("dexId"):
                                 # Insert pokemon if not exists
                                 # Clean the slug format for pokemon translation
                                 pokemon_slug = clean_slug_format(f"{lang}/pokemon/{card_data['dexId'][0]}")
                                 pokemon_id = insert_pokemon_if_not_exist(connection, card_data["dexId"][0], pokemon_slug, card_data["name"], language_ids[lang])
+                                if pokemon_id is None:
+                                    error("Failed to create pokemon for dex_id=%s", card_data["dexId"][0])
+                                    error("Pokemon data: slug='%s', name='%s'", pokemon_slug, card_data["name"])
+                                    error("Original card data: %s", card_data)
                             else:
                                 dexId = get_pokemon_id_by_name(connection, card_data["name"].split(' ')[0], language_ids[lang])
                                 if dexId == 0:
@@ -225,6 +246,10 @@ def scrap_poke_data(connection, lang: str):
                                 # Clean the slug format for pokemon translation
                                 pokemon_slug = clean_slug_format(f"{lang}/pokemon/{dexId}")
                                 pokemon_id = insert_pokemon_if_not_exist(connection, dexId, pokemon_slug, card_data["name"], language_ids[lang])
+                                if pokemon_id is None:
+                                    error("Failed to create pokemon for dex_id=%s", dexId)
+                                    error("Pokemon data: slug='%s', name='%s'", pokemon_slug, card_data["name"])
+                                    error("Original card data: %s", card_data)
                             # Insert the pokemon card
                             if card_data.get("level"):
                                 level = card_data["level"]
@@ -236,6 +261,11 @@ def scrap_poke_data(connection, lang: str):
                                 hp = 0
                             pokemon_card_slug = f"{card_slug}/pokemon"
                             pokemon_card_id = insert_pokemon_card(connection, PokemonCard(pokemon_card_slug, card_id, pokemon_id, hp, level))
+                            
+                            if pokemon_card_id is None:
+                                error("Failed to create pokemon card for card_id=%s", card_id)
+                                error("Pokemon card data: slug='%s', pokemon_id=%s, hp=%s, level=%s", pokemon_card_slug, pokemon_id, hp, level)
+                                error("Original card data: %s", card_data)
                             
                             if  card_data.get("types"):
                                 # Insert the pokemon card elements
