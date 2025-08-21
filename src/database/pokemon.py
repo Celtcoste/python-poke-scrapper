@@ -5,7 +5,7 @@ def get_pokemon_id_by_name(conn, pokemon_name: str, langId: str):
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "SELECT pokemon_id FROM pokemon_translation WHERE name = %s AND language_id = %s LIMIT 1",
+            "SELECT pokemon_id FROM pokemon_translation WHERE name = %s AND translation_language_id = %s LIMIT 1",
             (pokemon_name, langId)
         )   
         res = cursor.fetchone()
@@ -35,7 +35,7 @@ def insert_pokemon(conn, dexId: str):
         return dexId
     
     except mysql.connector.Error as err:
-        print(f"Error creating card: {err}")
+        print(f"Error creating pokemon: {err}")
         conn.rollback()
 
     finally:
@@ -45,7 +45,7 @@ def insert_pokemon_translation(conn, id: str, pokemon_id: str, name: str, langId
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "INSERT INTO pokemon_translation (id, pokemon_id, name, language_id) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
+            "INSERT INTO pokemon_translation (id, pokemon_id, name, translation_language_id) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
             (id, pokemon_id, name, langId)
         )
         # Valider les changements
@@ -53,7 +53,7 @@ def insert_pokemon_translation(conn, id: str, pokemon_id: str, name: str, langId
         return id
     
     except mysql.connector.Error as err:
-        print(f"Error creating card: {err}")
+        print(f"Error creating pokemon translation: {err}")
         conn.rollback()
 
     finally:

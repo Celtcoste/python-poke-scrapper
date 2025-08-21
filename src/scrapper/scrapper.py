@@ -43,6 +43,42 @@ category_enum = {
     "category-trainer"
 }
 
+# Dynamic category ID mapping - will be populated at runtime
+CATEGORY_IDS = {}
+
+def get_category_ids_mapping(connection):
+    """Get the actual category IDs from database"""
+    global CATEGORY_IDS
+    if not CATEGORY_IDS:  # Only load once
+        cursor = connection.cursor()
+        try:
+            cursor.execute("""
+                SELECT c.slug, c.id 
+                FROM category c 
+                ORDER BY c.id
+            """)
+            categories = cursor.fetchall()
+            print(f"DEBUG: Found categories in database: {categories}")
+            
+            # Map category slugs to IDs
+            for slug, cat_id in categories:
+                if 'energy' in slug.lower():
+                    CATEGORY_IDS['ENERGY'] = cat_id
+                elif 'pokemon' in slug.lower():
+                    CATEGORY_IDS['POKEMON'] = cat_id
+                elif 'trainer' in slug.lower():
+                    CATEGORY_IDS['TRAINER'] = cat_id
+            
+            print(f"DEBUG: Category ID mapping: {CATEGORY_IDS}")
+                    
+        except Exception as err:
+            print(f"Error loading category IDs: {err}")
+        finally:
+            cursor.close()
+    
+    return CATEGORY_IDS
+
+# Legacy enum for backward compatibility
 class Category(Enum):
     ENERGY = "category-energy"
     POKEMON = "category-pokemon"
@@ -56,6 +92,9 @@ category_id_table_name= {
 
 
 def scrap_poke_data(connection, lang: str):
+    # Load category IDs from database
+    category_ids = get_category_ids_mapping(connection)
+    
     base_url = f"https://api.tcgdex.net/v2/{api_langs[lang]}"
     blocs_url = f"{base_url}/series"
     sets_url = f"{base_url}/sets"
@@ -66,9 +105,9 @@ def scrap_poke_data(connection, lang: str):
     print(blocs_data)
     if blocs_data:
         for bloc_position, bloc_data in enumerate(blocs_data, 1):
-            if bloc_data["id"] != "sv":
-                print("Skipping bloc:", bloc_data["id"])
-                continue
+            # if bloc_data["id"] != "sv":
+            #     print("Skipping bloc:", bloc_data["id"])
+            #     continue
             print("Scrapping bloc:", bloc_data["id"])
             
             # Get the actual tcg_language_id (integer) from database
@@ -158,13 +197,16 @@ def scrap_poke_data(connection, lang: str):
                         insert_card_translation(connection, card_translation_slug, card_id, language_ids[lang], card_data["name"], description)
                         
                         # Insert the card type
-                        if id_category == Category.ENERGY.value:
+                        print(f"DEBUG: Processing card type with category ID: {id_category}")
+                        print(f"DEBUG: Available category IDs: {CATEGORY_IDS}")
+                        
+                        if id_category == CATEGORY_IDS.get('ENERGY', -1):
                             energy_card_slug = f"{card_slug}/energy"
                             insert_energy_card(connection, energy_card_slug, card_id, card_data["name"], language_ids[lang])
-                        elif id_category == Category.TRAINER.value:
+                        elif id_category == CATEGORY_IDS.get('TRAINER', -1):
                             trainer_card_slug = f"{card_slug}/trainer"
                             insert_trainer_card(connection, trainer_card_slug, card_id)
-                        elif id_category == Category.POKEMON.value:
+                        elif id_category == CATEGORY_IDS.get('POKEMON', -1):
                             if card_data.get("dexId"):
                                 # Insert pokemon if not exists
                                 pokemon_id = insert_pokemon_if_not_exist(connection, card_data["dexId"][0], f"{lang}/pokemon/{card_data["dexId"][0]}", card_data["name"], language_ids[lang])

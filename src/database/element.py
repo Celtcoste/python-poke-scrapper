@@ -9,7 +9,7 @@ def get_element_id_by_name(conn, element_name: str, langId: str):
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "SELECT element_id FROM element_translation WHERE name = %s AND language_id = %s LIMIT 1",
+            "SELECT element_id FROM element_translation WHERE name = %s AND translation_language_id = %s LIMIT 1",
             (element_name, langId,)
         )   
         
