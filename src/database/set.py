@@ -1,6 +1,46 @@
 import uuid
 import mysql.connector
 
+def get_set_id_by_slug(conn, slug: str):
+    """Get existing set ID by slug to handle duplicates"""
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "SELECT id FROM `serie` WHERE slug = %s LIMIT 1",
+            (slug,)
+        )   
+        res = cursor.fetchone()
+        if res is None:
+            return None
+        return res[0]
+
+    except mysql.connector.Error as err:
+        print(f"Error getting set id: {err}")
+        return None
+
+    finally:
+        cursor.close()
+
+def get_set_translation_id_by_slug(conn, slug: str):
+    """Get existing set translation ID by slug to handle duplicates"""
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            "SELECT id FROM `serie_translation` WHERE slug = %s LIMIT 1",
+            (slug,)
+        )   
+        res = cursor.fetchone()
+        if res is None:
+            return None
+        return res[0]
+
+    except mysql.connector.Error as err:
+        print(f"Error getting set translation id: {err}")
+        return None
+
+    finally:
+        cursor.close()
+
 class SetTranslation:
     def __init__(self, id, set_id, name, description, language_id):
         self.id = id
@@ -17,39 +57,51 @@ class Set:
         self.bloc_id = bloc_id
   
 def insert_set_translation(conn, data: SetTranslation):
+    # Check if set translation already exists
+    existing_id = get_set_translation_id_by_slug(conn, data.id)
+    if existing_id is not None:
+        print(f"Set translation '{data.id}' already exists with id: {existing_id}")
+        return existing_id
+    
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "INSERT INTO `serie_translation` (id, serie_id, name, description, language_id) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
+            "INSERT INTO `serie_translation` (slug, serie_id, name, description, translation_language_id) VALUES (%s, %s, %s, %s, %s)",
             (data.id, data.set_id, data.name, data.description, data.language_id)
         )
         # Valider les changements
         conn.commit()
-        return data.id
+        return cursor.lastrowid
 
     except mysql.connector.Error as err:
         print(f"Error creating set translation: {err}")
         conn.rollback()
+        return None
 
     finally:
         cursor.close()
         
 def insert_set(conn, data: Set):
+    # Check if set already exists
+    existing_id = get_set_id_by_slug(conn, data.id)
+    if existing_id is not None:
+        print(f"Set '{data.id}' already exists with id: {existing_id}")
+        return existing_id
+    
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "INSERT INTO `serie` (id, card_number, position, bloc_id) VALUES (%s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
+            "INSERT INTO `serie` (slug, card_number, position, bloc_id) VALUES (%s, %s, %s, %s)",
             (data.id, data.card_number, data.position, data.bloc_id)
         )
         # Valider les changements
         conn.commit()
-        return data.id
-
+        return cursor.lastrowid
 
     except mysql.connector.Error as err:
         print(f"Error creating set: {err}")
         conn.rollback()
-
+        return None
 
     finally:
         cursor.close()

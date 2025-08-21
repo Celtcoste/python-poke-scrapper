@@ -2,10 +2,10 @@ import requests
 import time
 from enum import Enum
 
-from ..database.bloc import Bloc, BlocTranslation, insert_bloc_translation, insert_bloc
-from ..database.set import Set, SetTranslation, insert_set_translation, insert_set
+from ..database.bloc import Bloc, BlocTranslation, insert_bloc_translation, insert_bloc, get_tcg_language_id_by_slug
+from ..database.set import Set, SetTranslation, insert_set_translation, insert_set, get_set_id_by_slug
 from ..database.illustrator import Illustrator, insert_illustrator
-from ..database.card import Card, PokemonCard, insert_card, insert_card_translation, insert_energy_card, insert_trainer_card, insert_pokemon_card, insert_pokemon_card_element, insert_card_variant, get_card_id, check_energy_card, check_trainer_card, check_pokemon_card
+from ..database.card import Card, PokemonCard, insert_card, insert_card_translation, insert_energy_card, insert_trainer_card, insert_pokemon_card, insert_pokemon_card_element, insert_card_variant, get_card_id, check_energy_card, check_trainer_card, check_pokemon_card, clean_slug_format
 from ..database.category import get_category_id_by_name
 from ..database.rarity import get_rarity_id_by_name
 from ..database.pokemon import insert_pokemon_if_not_exist, get_pokemon_id_by_name
@@ -70,23 +70,56 @@ def scrap_poke_data(connection, lang: str):
                 print("Skipping bloc:", bloc_data["id"])
                 continue
             print("Scrapping bloc:", bloc_data["id"])
-            # Create the bloc
-            bloc_id = insert_bloc(connection, Bloc(f"{tcg_language_ids[lang]}/{bloc_data["id"]}", 1, bloc_position, tcg_language_ids[lang]))
+            
+            # Get the actual tcg_language_id (integer) from database
+            tcg_lang_id = get_tcg_language_id_by_slug(connection, tcg_language_ids[lang])
+            if tcg_lang_id is None:
+                print(f"Error: TCG Language ID not found for slug: {tcg_language_ids[lang]}")
+                continue
+                
+            # Create bloc slug in the format: poke-fr/sv
+            bloc_slug = f"{tcg_language_ids[lang]}/{bloc_data['id']}"
+            
+            print(f"Creating bloc with slug: '{bloc_slug}' and tcg_language_id: {tcg_lang_id}")
+            # Create the bloc (id, set_number, position, tcg_id)
+            bloc_id = insert_bloc(connection, Bloc(bloc_slug, 1, bloc_position, tcg_lang_id))
+            
+            if bloc_id is None:
+                print(f"Error: Failed to create bloc '{bloc_slug}'. Skipping...")
+                continue
+                
             # Add the translation bloc
-            insert_bloc_translation(connection, BlocTranslation(f"{bloc_id}/translation", bloc_id, bloc_data["name"], "", language_ids[lang]))
+            translation_slug = f"{bloc_id}/translation"
+            insert_bloc_translation(connection, BlocTranslation(translation_slug, bloc_id, bloc_data["name"], "", language_ids[lang]))
             # Fetch the sets
             sets_data = fetch_data(f"{blocs_url}/{bloc_data["id"]}")
             if sets_data:
                 for set_position, set_data in enumerate(sets_data["sets"], 1):
                     # Insert the sets
-                    set_id = insert_set(connection, Set(f"{bloc_id}/{set_data["id"]}", set_data["cardCount"]["total"], set_position, bloc_id))
+                    # Create set slug in the format: poke-fr/sv/sv1 (using bloc slug + clean set id)
+                    raw_set_slug = f"{bloc_slug}/{set_data['id']}"
+                    set_slug = clean_slug_format(raw_set_slug)
+                    
+                    print(f"Creating set with slug: '{set_slug}' and bloc_id: {bloc_id}")
+                    set_id = insert_set(connection, Set(set_slug, set_data["cardCount"]["total"], set_position, bloc_id))
+                    
+                    if set_id is None:
+                        print(f"Error: Failed to create set '{set_slug}'. Skipping...")
+                        continue
+                        
                     # Add translation set
-                    insert_set_translation(connection, SetTranslation(f"{set_id}/translation", set_id, set_data["name"], "", language_ids[lang]))
+                    set_translation_slug = f"{set_id}/translation"
+                    insert_set_translation(connection, SetTranslation(set_translation_slug, set_id, set_data["name"], "", language_ids[lang]))
             
                     # Fetch the set cards
                     sets_data = fetch_data(f"{sets_url}/{set_data["id"]}")
                     for card_position, card_global_data in enumerate(sets_data["cards"]): 
-                        exist = get_card_id(connection, f"{set_id}/{card_global_data["localId"]}")
+                        # Create card slug in the format: set_slug/card_localId (with cleaned format)
+                        raw_card_slug = f"{set_slug}/{card_global_data['localId']}"
+                        card_slug = clean_slug_format(raw_card_slug)
+                        
+                        print(f"Processing card with slug: '{card_slug}'  (position: {card_global_data['localId']})")
+                        exist = get_card_id(connection, card_slug)
                         if exist != 0:
                             if check_pokemon_card(connection, exist) != 0 or check_energy_card(connection, exist) != 0 or check_trainer_card(connection, exist) != 0:
                                 print("Already scrapped Card: ", card_global_data["id"], " - ", card_global_data["name"])
@@ -106,8 +139,14 @@ def scrap_poke_data(connection, lang: str):
                         id_category = get_category_id_by_name(connection, card_data["category"])
                         # Get the rarity id
                         id_rarity = get_rarity_id_by_name(connection, card_data["rarity"])
-                        # Insert the card
-                        card_id = insert_card(connection, Card(f"{set_id}/{card_data["localId"]}", card_data["localId"], id_category, id_rarity, set_id, id_illustrator))
+                        # Insert the card (use cleaned position format)
+                        cleaned_position = clean_slug_format(card_data["localId"]) if card_data["localId"] else card_data["localId"]
+                        card_id = insert_card(connection, Card(card_slug, cleaned_position, id_category, id_rarity, set_id, id_illustrator))
+                        
+                        if card_id is None:
+                            print(f"Error: Failed to create card '{card_slug}'. Skipping...")
+                            continue
+                            
                         # Add card translation
                         if card_data.get("description"):
                             description = card_data["description"]
@@ -115,13 +154,16 @@ def scrap_poke_data(connection, lang: str):
                             description = card_data["effect"]
                         else:
                             description = None
-                        insert_card_translation(connection, f"{card_id}/translation", card_id, language_ids[lang], card_data["name"], description)
+                        card_translation_slug = f"{card_slug}/translation"
+                        insert_card_translation(connection, card_translation_slug, card_id, language_ids[lang], card_data["name"], description)
                         
                         # Insert the card type
                         if id_category == Category.ENERGY.value:
-                            insert_energy_card(connection, f"{card_id}/energy", card_id, card_data["name"], language_ids[lang])
+                            energy_card_slug = f"{card_slug}/energy"
+                            insert_energy_card(connection, energy_card_slug, card_id, card_data["name"], language_ids[lang])
                         elif id_category == Category.TRAINER.value:
-                            insert_trainer_card(connection, f"{card_id}/trainer", card_id)
+                            trainer_card_slug = f"{card_slug}/trainer"
+                            insert_trainer_card(connection, trainer_card_slug, card_id)
                         elif id_category == Category.POKEMON.value:
                             if card_data.get("dexId"):
                                 # Insert pokemon if not exists
@@ -145,7 +187,8 @@ def scrap_poke_data(connection, lang: str):
                                 hp = card_data["hp"]
                             else:
                                 hp = 0
-                            pokemon_card_id = insert_pokemon_card(connection, PokemonCard( f"{card_id}/pokemon", card_id, pokemon_id, hp, level))
+                            pokemon_card_slug = f"{card_slug}/pokemon"
+                            pokemon_card_id = insert_pokemon_card(connection, PokemonCard(pokemon_card_slug, card_id, pokemon_id, hp, level))
                             
                             if  card_data.get("types"):
                                 # Insert the pokemon card elements
