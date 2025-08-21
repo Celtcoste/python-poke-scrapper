@@ -1,4 +1,5 @@
 import mysql.connector
+from ..utils.logger import debug, error
 
 # Mapping from API category names to database category names (French)
 CATEGORY_NAME_MAPPING = {
@@ -15,7 +16,7 @@ def get_category_id_by_name(conn, category_name: str):
         # Map API category name to database category name
         db_category_name = CATEGORY_NAME_MAPPING.get(category_name, category_name)
         
-        print(f"DEBUG: Looking for category: API='{category_name}' -> DB='{db_category_name}'")
+        debug("Looking for category: API='%s' -> DB='%s'", category_name, db_category_name)
         
         cursor.execute(
             "SELECT category_id FROM category_translation WHERE name = %s LIMIT 1",
@@ -24,18 +25,18 @@ def get_category_id_by_name(conn, category_name: str):
         res = cursor.fetchone()
         
         if res is None:
-            print(f"DEBUG: Category not found. Let's see what categories exist:")
+            debug("Category not found. Let's see what categories exist:")
             cursor.execute("SELECT name, category_id FROM category_translation LIMIT 10")
             existing_categories = cursor.fetchall()
-            print(f"DEBUG: Existing categories: {existing_categories}")
+            debug("Existing categories: %s", existing_categories)
             return 0
             
         category_id = res[0]
-        print(f"DEBUG: Found category '{db_category_name}' with ID: {category_id}")
+        debug("Found category '%s' with ID: %s", db_category_name, category_id)
         return category_id
 
     except mysql.connector.Error as err:
-        print(f"Error getting category_id: {err}")
+        error("Error getting category_id: %s", err)
         conn.rollback()
         return 0
 

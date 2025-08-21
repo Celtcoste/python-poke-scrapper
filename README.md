@@ -22,3 +22,10 @@ We based our scrapping on the API https://tcgdex.dev/
 
 If installing package by pip and getting this error `error: externally-managed-environment`
 Then use this flag: `--break-system-packages`
+
+Or manage in venv env:
+
+`python3 -m venv ./venv`
+`source ./venv/bin/activate`
+
+And then install dependencies

@@ -1,5 +1,6 @@
 import uuid
 import mysql.connector
+from ..utils.logger import debug, error
 
 def get_tcg_language_id_by_slug(conn, slug: str):
     """Get the tcg_language ID (integer) by slug"""
@@ -15,7 +16,7 @@ def get_tcg_language_id_by_slug(conn, slug: str):
         return res[0]
 
     except mysql.connector.Error as err:
-        print(f"Error getting tcg_language id: {err}")
+        error("Error getting tcg_language id: %s", err)
         return None
 
     finally:
@@ -35,7 +36,7 @@ def get_bloc_id_by_slug(conn, slug: str):
         return res[0]
 
     except mysql.connector.Error as err:
-        print(f"Error getting bloc id: {err}")
+        error("Error getting bloc id: %s", err)
         return None
 
     finally:
@@ -76,7 +77,7 @@ def get_bloc_translation_id_by_slug(conn, slug: str):
         return res[0]
 
     except mysql.connector.Error as err:
-        print(f"Error getting bloc translation id: {err}")
+        error("Error getting bloc translation id: %s", err)
         return None
 
     finally:
@@ -86,7 +87,7 @@ def insert_bloc_translation(conn, data: BlocTranslation):
     # Check if bloc translation already exists
     existing_id = get_bloc_translation_id_by_slug(conn, data.id)
     if existing_id is not None:
-        print(f"Bloc translation '{data.id}' already exists with id: {existing_id}")
+        debug("Bloc translation '%s' already exists with id: %s", data.id, existing_id)
         return existing_id
     
     cursor = conn.cursor()
@@ -100,7 +101,7 @@ def insert_bloc_translation(conn, data: BlocTranslation):
         return cursor.lastrowid
     
     except mysql.connector.Error as err:
-        print(f"Error creating bloc translation: {err}")
+        error("Error creating bloc translation: %s", err)
         conn.rollback()
         return None
 
@@ -111,7 +112,7 @@ def insert_bloc(conn, data: Bloc):
     # Check if bloc already exists
     existing_id = get_bloc_id_by_slug(conn, data.id)
     if existing_id is not None:
-        print(f"Bloc '{data.id}' already exists with id: {existing_id}")
+        debug("Bloc '%s' already exists with id: %s", data.id, existing_id)
         return existing_id
     
     cursor = conn.cursor()
@@ -125,7 +126,7 @@ def insert_bloc(conn, data: Bloc):
         return cursor.lastrowid
     
     except mysql.connector.Error as err:
-        print(f"Error creating bloc: {err}")
+        error("Error creating bloc: %s", err)
         conn.rollback()
         return None
 

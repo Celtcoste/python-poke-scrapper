@@ -1,6 +1,7 @@
 import mysql.connector
 import uuid
 import re
+from ..utils.logger import debug, error
 
 from .element import get_element_id_by_name
 
@@ -35,7 +36,7 @@ def get_card_id_by_slug(conn, slug: str):
         return res[0]
 
     except mysql.connector.Error as err:
-        print(f"Error getting card id: {err}")
+        error("Error getting card id: %s", err)
         return None
 
     finally:
@@ -55,7 +56,7 @@ def get_card_translation_id_by_slug(conn, slug: str):
         return res[0]
 
     except mysql.connector.Error as err:
-        print(f"Error getting card translation id: {err}")
+        error("Error getting card translation id: %s", err)
         return None
 
     finally:
@@ -154,7 +155,7 @@ def insert_card(conn, data: Card):
     # Check if card already exists
     existing_id = get_card_id_by_slug(conn, cleaned_slug)
     if existing_id is not None:
-        print(f"Card '{cleaned_slug}' already exists with id: {existing_id}")
+        debug("Card '%s' already exists with id: %s", cleaned_slug, existing_id)
         return existing_id
     
     cursor = conn.cursor()
