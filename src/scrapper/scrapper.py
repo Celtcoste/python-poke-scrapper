@@ -8,7 +8,7 @@ from ..database.set import Set, SetTranslation, insert_set_translation, insert_s
 from ..database.illustrator import Illustrator, insert_illustrator
 from ..database.card import Card, PokemonCard, insert_card, insert_card_translation, insert_energy_card, insert_trainer_card, insert_pokemon_card, insert_pokemon_card_element, insert_card_variant, get_card_id, check_energy_card, check_trainer_card, check_pokemon_card, clean_slug_format
 from ..database.category import get_category_id_by_name
-from ..database.rarity import get_rarity_id_by_name
+from ..database.rarity import get_rarity_id_by_name, insert_card_rarity
 from ..database.pokemon import insert_pokemon_if_not_exist, get_pokemon_id_by_name
 
 def fetch_data(url):
@@ -273,6 +273,13 @@ def scrap_poke_data(connection, lang: str):
                                     insert_pokemon_card_element(connection, pokemon_card_id, type, language_ids[lang])
                         else:
                             error("Invalid category: %s", id_category)
+                        
+                        # Add card rarity relationship
+                        rarity_result = insert_card_rarity(connection, card_id, card_data["rarity"])
+                        if rarity_result is None:
+                            error("Failed to create card rarity for card_id=%s with rarity='%s'", card_id, card_data["rarity"])
+                        else:
+                            debug("Successfully added rarity '%s' (rarity_id=%s) to card_id=%s", card_data["rarity"], rarity_result, card_id)
                         
                         # Add card variants
                         if card_data["variants"]["firstEdition"] == True:
