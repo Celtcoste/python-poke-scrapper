@@ -22,6 +22,107 @@ def clean_slug_format(slug: str) -> str:
     
     return '/'.join(cleaned_parts)
 
+def clean_seo_name(name: str) -> str:
+    """Clean name for SEO path usage - matches SQL script logic"""
+    import re
+    
+    if not name:
+        return ''
+    
+    # Convert to lowercase and trim
+    cleaned = name.lower().strip()
+    
+    # Character replacements (matching SQL script)
+    replacements = {
+        'à': 'a', 'â': 'a', 
+        'é': 'e', 'è': 'e', 'ê': 'e',
+        'ï': 'i', 'î': 'i',
+        'ô': 'o',
+        'ù': 'u',
+        'ç': 'c',
+        'æ': 'ae',
+        'œ': 'oe',
+        '☆': 'star',
+        '★': 'star', 
+        'δ': 'delta',
+        '◇': 'prism'
+    }
+    
+    # Apply character replacements
+    for old_char, new_char in replacements.items():
+        cleaned = cleaned.replace(old_char, new_char)
+    
+    # Remove special characters: ()[]., +?!&♀♂#
+    cleaned = re.sub(r'[()[\].+?!&♀♂#]', '', cleaned)
+    
+    # Replace any non-alphanumeric characters with hyphens
+    cleaned = re.sub(r'[^a-zA-Z0-9]', '-', cleaned)
+    
+    # Replace multiple consecutive hyphens with single hyphen
+    cleaned = re.sub(r'-{2,}', '-', cleaned)
+    
+    # Remove trailing hyphen
+    cleaned = re.sub(r'-$', '', cleaned)
+    
+    # Remove leading hyphen
+    cleaned = re.sub(r'^-', '', cleaned)
+    
+    return cleaned
+
+def get_card_seo_data(conn, card_id: str, language_id: str):
+    """Get all the data needed to build the SEO path for a card"""
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            SELECT 
+                c.position as card_position,
+                s.card_number as serie_card_count,
+                st.name as serie_name,
+                bt.name as bloc_name,
+                tl.slug as tcg_language_slug
+            FROM card c
+            JOIN serie s ON c.serie_id = s.id
+            JOIN serie_translation st ON s.id = st.serie_id AND st.translation_language_id = %s
+            JOIN bloc b ON s.bloc_id = b.id
+            JOIN bloc_translation bt ON b.id = bt.bloc_id AND bt.translation_language_id = %s
+            JOIN tcg_language tl ON b.tcg_language_id = tl.id
+            WHERE c.id = %s
+        """, (language_id, language_id, card_id))
+        
+        result = cursor.fetchone()
+        if result:
+            return {
+                'card_position': result[0],
+                'serie_card_count': result[1], 
+                'serie_name': result[2],
+                'bloc_name': result[3],
+                'tcg_language_slug': result[4]
+            }
+        return None
+        
+    except mysql.connector.Error as err:
+        error("Error getting card SEO data: %s", err)
+        return None
+    finally:
+        cursor.close()
+
+def build_seo_path(card_name: str, seo_data: dict) -> str:
+    """Build SEO path from card data"""
+    if not seo_data:
+        # Fallback to simple name-based SEO path
+        return clean_seo_name(card_name)
+    
+    # Clean all components
+    clean_card_name = clean_seo_name(card_name)
+    clean_serie_name = clean_seo_name(seo_data['serie_name'])
+    clean_bloc_name = clean_seo_name(seo_data['bloc_name'])
+    clean_tcg_slug = clean_seo_name(seo_data['tcg_language_slug'])
+    
+    # Format: {card_name}-{card_position}-{serie_card_count}-{serie_name}-{bloc_name}-{tcg_language_slug}
+    seo_path = f"{clean_card_name}-{seo_data['card_position']}-{seo_data['serie_card_count']}-{clean_serie_name}-{clean_bloc_name}-{clean_tcg_slug}"
+    
+    return seo_path
+
 def get_card_id_by_slug(conn, slug: str):
     """Get existing card ID by slug to handle duplicates"""
     cursor = conn.cursor()
@@ -183,13 +284,17 @@ def insert_card_translation(conn, slug: str, card_id: str, language_id: str, nam
     # Check if card translation already exists
     existing_id = get_card_translation_id_by_slug(conn, cleaned_slug)
     if existing_id is not None:
-        print(f"Card translation '{cleaned_slug}' already exists with id: {existing_id}")
+        debug("Card translation '%s' already exists with id: %s", cleaned_slug, existing_id)
         return existing_id
     
     cursor = conn.cursor()
     try:
-        # Create a simple SEO path from the name
-        seo_path = name.lower().replace(' ', '-').replace("'", '').replace('"', '')
+        # Get card SEO data for building complex SEO path
+        seo_data = get_card_seo_data(conn, card_id, language_id)
+        seo_path = build_seo_path(name, seo_data)
+        
+        debug("Generated SEO path: %s for card: %s", seo_path, name)
+        
         cursor.execute(
             "INSERT INTO card_translation (slug, seo_path, card_id, translation_language_id, name, description) VALUES (%s, %s, %s, %s, %s, %s)",
             (cleaned_slug, seo_path, card_id, language_id, name, description)
@@ -199,7 +304,7 @@ def insert_card_translation(conn, slug: str, card_id: str, language_id: str, nam
         return cursor.lastrowid
     
     except mysql.connector.Error as err:
-        print(f"Error creating card translation: {err}")
+        error("Error creating card translation: %s", err)
         conn.rollback()
         return None
 
