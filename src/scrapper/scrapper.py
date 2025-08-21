@@ -25,7 +25,7 @@ language_ids = {
     "jp": 3
 }
     
-tcg_ids = {
+tcg_language_ids = {
     "fr": "poke-fr",
     "en": "poke-en",
     "jp": "poke-jp"
@@ -63,10 +63,15 @@ def scrap_poke_data(connection, lang: str):
     
     # Get bloc list
     blocs_data = fetch_data(blocs_url)
+    print(blocs_data)
     if blocs_data:
         for bloc_position, bloc_data in enumerate(blocs_data, 1):
+            if bloc_data["id"] != "sv":
+                print("Skipping bloc:", bloc_data["id"])
+                continue
+            print("Scrapping bloc:", bloc_data["id"])
             # Create the bloc
-            bloc_id = insert_bloc(connection, Bloc(f"{tcg_ids[lang]}/{bloc_data["id"]}", 1, bloc_position, tcg_ids[lang]))
+            bloc_id = insert_bloc(connection, Bloc(f"{tcg_language_ids[lang]}/{bloc_data["id"]}", 1, bloc_position, tcg_language_ids[lang]))
             # Add the translation bloc
             insert_bloc_translation(connection, BlocTranslation(f"{bloc_id}/translation", bloc_id, bloc_data["name"], "", language_ids[lang]))
             # Fetch the sets

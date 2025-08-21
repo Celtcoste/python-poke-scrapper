@@ -123,7 +123,7 @@ def insert_card_translation(conn, id: str, card_id: str, language_id: str, name:
     cursor = conn.cursor()
     try:
         cursor.execute(
-            "INSERT INTO card_translation (id, card_id, language_id, name, description) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
+            "INSERT INTO card_translation (id, card_id, translation_language_id, name, description) VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE id=id",
             (id, card_id, language_id, name, description)
         )
         # Valider les changements
@@ -131,7 +131,7 @@ def insert_card_translation(conn, id: str, card_id: str, language_id: str, name:
         return id
     
     except mysql.connector.Error as err:
-        print(f"Error creating card: {err}")
+        print(f"Error creating card translation: {err}")
         conn.rollback()
 
     finally:
