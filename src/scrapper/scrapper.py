@@ -129,7 +129,7 @@ def scrap_poke_data(connection, lang: str):
                 continue
                 
             # Add the translation bloc
-            translation_slug = f"{bloc_id}/translation"
+            translation_slug = f"{bloc_slug}/translation/{api_langs[lang]}"
             insert_bloc_translation(connection, BlocTranslation(translation_slug, bloc_id, bloc_data["name"], "", language_ids[lang]))
             # Fetch the sets
             sets_data = fetch_data(f"{blocs_url}/{bloc_data["id"]}")
@@ -148,7 +148,7 @@ def scrap_poke_data(connection, lang: str):
                         continue
                         
                     # Add translation set
-                    set_translation_slug = f"{set_id}/translation"
+                    set_translation_slug = f"{set_slug}/translation/{api_langs[lang]}"
                     insert_set_translation(connection, SetTranslation(set_translation_slug, set_id, set_data["name"], "", language_ids[lang]))
             
                     # Fetch the set cards
@@ -197,7 +197,7 @@ def scrap_poke_data(connection, lang: str):
                             description = card_data["effect"]
                         else:
                             description = None
-                        card_translation_slug = f"{card_slug}/translation"
+                        card_translation_slug = f"{card_slug}/translation/{api_langs[lang]}"
                         translation_id = insert_card_translation(connection, card_translation_slug, card_id, language_ids[lang], card_data["name"], description)
                         
                         if translation_id is None:
@@ -244,7 +244,7 @@ def scrap_poke_data(connection, lang: str):
                                     if dexId == 0:
                                         dexId = input("Insert dexID for pokemon (" + card_data["name"] + " and " + card_data["id"]+ "): ")
                                 # Clean the slug format for pokemon translation
-                                pokemon_slug = clean_slug_format(f"{lang}/pokemon/{dexId}")
+                                pokemon_slug = clean_slug_format(f"pokemon/{dexId}/{lang}")
                                 pokemon_id = insert_pokemon_if_not_exist(connection, dexId, pokemon_slug, card_data["name"], language_ids[lang])
                                 if pokemon_id is None:
                                     error("Failed to create pokemon for dex_id=%s", dexId)
