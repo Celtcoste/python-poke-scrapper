@@ -5,23 +5,6 @@ from ..utils.logger import debug, error
 
 from .element import get_element_id_by_name
 
-def clean_slug_format(slug: str) -> str:
-    """Clean slug format by removing leading zeros from numbers"""
-    # Split the slug by '/' and process each part
-    parts = slug.split('/')
-    cleaned_parts = []
-    
-    for part in parts:
-        # Remove leading zeros from numbers (001 -> 1, sv01 -> sv1)
-        # This regex finds sequences of letters followed by numbers and removes leading zeros
-        cleaned_part = re.sub(r'(\D*)0*(\d+)', r'\1\2', part)
-        # Handle pure numbers (001 -> 1)
-        if part.isdigit():
-            cleaned_part = str(int(part))
-        cleaned_parts.append(cleaned_part)
-    
-    return '/'.join(cleaned_parts)
-
 def clean_seo_name(name: str) -> str:
     """Clean name for SEO path usage - matches SQL script logic"""
     import re
@@ -249,26 +232,22 @@ def check_pokemon_card(conn, id: str):
 def get_card_id(conn, id: str):
     """Legacy function for backward compatibility - now uses slug-based lookup"""
     # Clean the slug format and use the new function
-    cleaned_slug = clean_slug_format(id)
-    result = get_card_id_by_slug(conn, cleaned_slug)
+    result = get_card_id_by_slug(conn, id)
     # Return 0 for not found to maintain backward compatibility
     return result if result is not None else 0
         
 def insert_card(conn, data: Card):
-    # Clean the slug format
-    cleaned_slug = clean_slug_format(data.id)
-    
     # Check if card already exists
-    existing_id = get_card_id_by_slug(conn, cleaned_slug)
+    existing_id = get_card_id_by_slug(conn, data.id)
     if existing_id is not None:
-        debug("Card '%s' already exists with id: %s", cleaned_slug, existing_id)
+        debug("Card '%s' already exists with id: %s", data.id, existing_id)
         return existing_id
     
     cursor = conn.cursor()
     try:
         cursor.execute(
             "INSERT INTO card (slug, position, category_id, rarity_id, serie_id, illustrator_id) VALUES (%s, %s, %s, %s, %s, %s)",
-            (cleaned_slug, data.position, data.category_id, data.rarity_id, data.set_id, data.illustrator_id)
+            (data.id, data.position, data.category_id, data.rarity_id, data.set_id, data.illustrator_id)
         )
         # Valider les changements
         conn.commit()
@@ -283,13 +262,10 @@ def insert_card(conn, data: Card):
         cursor.close()
         
 def insert_card_translation(conn, slug: str, card_id: str, language_id: str, name: str, description: str):
-    # Clean the slug format
-    cleaned_slug = clean_slug_format(slug)
-    
     # Check if card translation already exists
-    existing_id = get_card_translation_id_by_slug(conn, cleaned_slug)
+    existing_id = get_card_translation_id_by_slug(conn, slug)
     if existing_id is not None:
-        debug("Card translation '%s' already exists with id: %s", cleaned_slug, existing_id)
+        debug("Card translation '%s' already exists with id: %s", slug, existing_id)
         return existing_id
     
     cursor = conn.cursor()
@@ -302,7 +278,7 @@ def insert_card_translation(conn, slug: str, card_id: str, language_id: str, nam
         
         cursor.execute(
             "INSERT INTO card_translation (slug, seo_path, card_id, translation_language_id, name, description) VALUES (%s, %s, %s, %s, %s, %s)",
-            (cleaned_slug, seo_path, card_id, language_id, name, description)
+            (slug, seo_path, card_id, language_id, name, description)
         )
         # Valider les changements
         conn.commit()
@@ -337,13 +313,10 @@ def get_energy_card_id_by_slug(conn, slug: str):
         cursor.close()
 
 def insert_energy_card(conn, slug: str, card_id: str, energy_type: str, langId: str):
-    # Clean the slug format
-    cleaned_slug = clean_slug_format(slug)
-    
     # Check if energy card already exists
-    existing_id = get_energy_card_id_by_slug(conn, cleaned_slug)
+    existing_id = get_energy_card_id_by_slug(conn, slug)
     if existing_id is not None:
-        print(f"Energy card '{cleaned_slug}' already exists with id: {existing_id}")
+        print(f"Energy card '{slug}' already exists with id: {existing_id}")
         return existing_id
     
     cursor = conn.cursor()
@@ -355,7 +328,7 @@ def insert_energy_card(conn, slug: str, card_id: str, energy_type: str, langId: 
             element_id = get_element_id_by_name(conn, "Special", langId)
         cursor.execute(
             "INSERT INTO energy_card (slug, card_id, element_id) VALUES (%s, %s, %s)",
-            (cleaned_slug, card_id, element_id)
+            (slug, card_id, element_id)
         )
         # Valider les changements
         conn.commit()
@@ -390,20 +363,17 @@ def get_trainer_card_id_by_slug(conn, slug: str):
         cursor.close()
 
 def insert_trainer_card(conn, slug: str, card_id: str):
-    # Clean the slug format
-    cleaned_slug = clean_slug_format(slug)
-    
     # Check if trainer card already exists
-    existing_id = get_trainer_card_id_by_slug(conn, cleaned_slug)
+    existing_id = get_trainer_card_id_by_slug(conn, slug)
     if existing_id is not None:
-        print(f"Trainer card '{cleaned_slug}' already exists with id: {existing_id}")
+        print(f"Trainer card '{slug}' already exists with id: {existing_id}")
         return existing_id
     
     cursor = conn.cursor()
     try:
         cursor.execute(
             "INSERT INTO trainer_card (slug, card_id) VALUES (%s, %s)",
-            (cleaned_slug, card_id)
+            (slug, card_id)
         )
         # Valider les changements
         conn.commit()
@@ -438,20 +408,17 @@ def get_pokemon_card_id_by_slug(conn, slug: str):
         cursor.close()
 
 def insert_pokemon_card(conn, data: PokemonCard):
-    # Clean the slug format
-    cleaned_slug = clean_slug_format(data.id)
-    
     # Check if pokemon card already exists
-    existing_id = get_pokemon_card_id_by_slug(conn, cleaned_slug)
+    existing_id = get_pokemon_card_id_by_slug(conn, data.id)
     if existing_id is not None:
-        print(f"Pokemon card '{cleaned_slug}' already exists with id: {existing_id}")
+        print(f"Pokemon card '{data.id}' already exists with id: {existing_id}")
         return existing_id
     
     cursor = conn.cursor()
     try:
         cursor.execute(
             "INSERT INTO pokemon_card (slug, card_id, pokemon_id, hp, level) VALUES (%s, %s, %s, %s, %s)",
-            (cleaned_slug, data.card_id, data.pokemon_id, data.hp, data.level)
+            (data.id, data.card_id, data.pokemon_id, data.hp, data.level)
         )
         # Valider les changements
         conn.commit()
