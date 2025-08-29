@@ -222,11 +222,12 @@ def scrap_poke_data(connection, lang: str):
                                 error("Trainer card data: slug='%s'", trainer_card_slug)
                                 error("Original card data: %s", card_data)
                         elif id_category == CATEGORY_IDS.get('POKEMON', -1):
+                            real_pokemon_name = card_data["name"].split('-ex')[0].split('-GX')[0].split(' ex')[0].split(' GX')[0].split('-EX')[0].split(' EX')[0]
                             if card_data.get("dexId"):
                                 # Insert pokemon if not exists
                                 # Clean the slug format for pokemon translation
                                 pokemon_slug = f"{lang}/pokemon/{card_data['dexId'][0]}"
-                                pokemon_id = insert_pokemon_if_not_exist(connection, card_data["dexId"][0], pokemon_slug, card_data["name"], language_ids[lang])
+                                pokemon_id = insert_pokemon_if_not_exist(connection, card_data["dexId"][0], pokemon_slug, real_pokemon_name, language_ids[lang])
                                 if pokemon_id is None:
                                     error("Failed to create pokemon for dex_id=%s", card_data["dexId"][0])
                                     error("Pokemon data: slug='%s', name='%s'", pokemon_slug, card_data["name"])
@@ -237,12 +238,12 @@ def scrap_poke_data(connection, lang: str):
                                     if len(card_data["name"].split(' ')) > 1:
                                         dexId = get_pokemon_id_by_name(connection, card_data["name"].split(' ')[1], language_ids[lang])
                                 if dexId == 0:
-                                    dexId = get_pokemon_id_by_name(connection, card_data["name"].split('-ex')[0], language_ids[lang])
+                                    dexId = get_pokemon_id_by_name(connection, real_pokemon_name, language_ids[lang])
                                     if dexId == 0:
                                         dexId = input("Insert dexID for pokemon (" + card_data["name"] + " and " + card_data["id"]+ "): ")
                                 # Clean the slug format for pokemon translation
                                 pokemon_slug = f"pokemon/{dexId}/{lang}"
-                                pokemon_id = insert_pokemon_if_not_exist(connection, dexId, pokemon_slug, card_data["name"], language_ids[lang])
+                                pokemon_id = insert_pokemon_if_not_exist(connection, dexId, pokemon_slug, real_pokemon_name, language_ids[lang])
                                 if pokemon_id is None:
                                     error("Failed to create pokemon for dex_id=%s", dexId)
                                     error("Pokemon data: slug='%s', name='%s'", pokemon_slug, card_data["name"])
