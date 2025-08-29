@@ -29,3 +29,9 @@ Or manage in venv env:
 `source ./venv/bin/activate`
 
 And then install dependencies
+
+## TODO
+
+Manage Sachanobi -> amphinobi
+Manage de la team Aqua/Magma
+Manage de Hisui, ....

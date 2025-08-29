@@ -222,7 +222,7 @@ def scrap_poke_data(connection, lang: str):
                                 error("Trainer card data: slug='%s'", trainer_card_slug)
                                 error("Original card data: %s", card_data)
                         elif id_category == CATEGORY_IDS.get('POKEMON', -1):
-                            real_pokemon_name = card_data["name"].split('-ex')[0].split('-GX')[0].split(' ex')[0].split(' GX')[0].split('-EX')[0].split(' EX')[0]
+                            real_pokemon_name = card_data["name"].split('-ex')[0].split('-GX')[0].split(' ex')[0].split(' GX')[0].split('-EX')[0].split(' EX')[0].split(' V')
                             if card_data.get("dexId"):
                                 # Insert pokemon if not exists
                                 # Clean the slug format for pokemon translation
