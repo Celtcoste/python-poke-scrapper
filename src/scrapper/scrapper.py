@@ -106,9 +106,9 @@ def scrap_poke_data(connection, lang: str):
     debug("Blocs data: %s", blocs_data)
     if blocs_data:
         for bloc_position, bloc_data in enumerate(blocs_data, 1):
-            # if bloc_data["id"] != "sv":
-            #     debug("Skipping bloc: %s", bloc_data["id"])
-            #     continue
+            if bloc_data["id"] != "tcgp":
+                debug("Skipping bloc: %s", bloc_data["id"])
+                continue
             info("Scrapping bloc: %s", bloc_data["id"])
             
             # Get the actual tcg_language_id (integer) from database
