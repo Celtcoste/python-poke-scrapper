@@ -318,11 +318,17 @@ def insert_energy_card(conn, slug: str, card_id: str, energy_type: str, langId: 
     
     cursor = conn.cursor()
     try:
-        element_id = get_element_id_by_name(conn, energy_type.split(' ')[0], langId)
+        # Try to get element by first word, with auto-create enabled
+        element_id = get_element_id_by_name(conn, energy_type.split(' ')[0], langId, auto_create=True)
         if element_id == 0 and len(energy_type.split(' ')) > 1:
-            element_id = get_element_id_by_name(conn, energy_type.split(' ')[1], langId)
+            element_id = get_element_id_by_name(conn, energy_type.split(' ')[1], langId, auto_create=True)
         if element_id == 0:
-            element_id = get_element_id_by_name(conn, "Special", langId)
+            # Fallback: try full energy type name with auto-create
+            element_id = get_element_id_by_name(conn, energy_type, langId, auto_create=True)
+        if element_id == 0:
+            # Last resort: use Special
+            element_id = get_element_id_by_name(conn, "Spéciale", langId, auto_create=True)
+
         cursor.execute(
             "INSERT INTO energy_card (slug, card_id, element_id) VALUES (%s, %s, %s)",
             (slug, card_id, element_id)
@@ -433,10 +439,13 @@ def insert_pokemon_card(conn, data: PokemonCard):
 def insert_pokemon_card_element(conn, pokemon_card_id: str, element: str, langId: str):
     cursor = conn.cursor()
     try:
-        element_id = get_element_id_by_name(conn, element, langId)
+        # Get element with auto-create enabled
+        element_id = get_element_id_by_name(conn, element, langId, auto_create=True)
+
         if element_id == 0:
-            element_id = get_element_id_by_name(conn, element, langId)
-            
+            error("Failed to get or create element '%s' for language %s", element, langId)
+            return
+
         cursor.execute(
             "INSERT INTO pokemon_card_elements (pokemon_card_id, element_id) VALUES (%s, %s) ON DUPLICATE KEY UPDATE pokemon_card_id=pokemon_card_id",
             (pokemon_card_id, element_id)

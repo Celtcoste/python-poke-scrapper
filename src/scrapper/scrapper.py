@@ -191,15 +191,25 @@ def scrap_poke_data(connection, lang: str):
                             id_illustrator = insert_illustrator(connection, Illustrator("Unknown"))
                         # Get the category id
                         id_category = get_category_id_by_name(connection, card_data["category"])
-                        # Get the rarity id
-                        id_rarity = get_rarity_id_by_name(connection, card_data["rarity"])
+                        # Get the rarity id (with auto-create enabled)
+                        id_rarity = get_rarity_id_by_name(connection, card_data["rarity"], language_ids[lang], auto_create=True)
+
+                        # Validate required foreign keys before insert
+                        if id_category == 0 or id_category is None:
+                            error("Invalid category_id for card '%s'. Category: '%s'. Skipping...", card_slug, card_data["category"])
+                            continue
+
+                        if id_rarity == 0 or id_rarity is None:
+                            error("Invalid rarity_id for card '%s'. Rarity: '%s'. Skipping...", card_slug, card_data["rarity"])
+                            continue
+
                         # Insert the card (use cleaned position format)
                         card_id = insert_card(connection, Card(card_slug, card_data["localId"], id_category, id_rarity, set_id, id_illustrator))
-                        
+
                         if card_id is None:
                             error("Failed to create card '%s'. Skipping...", card_slug)
                             error("Card data received from API: %s", card_data)
-                            error("Card object details: slug='%s', position='%s', category_id=%s, rarity_id=%s, set_id=%s, illustrator_id=%s", 
+                            error("Card object details: slug='%s', position='%s', category_id=%s, rarity_id=%s, set_id=%s, illustrator_id=%s",
                                   card_slug, card_data["localId"], id_category, id_rarity, set_id, id_illustrator)
                             continue
                             
