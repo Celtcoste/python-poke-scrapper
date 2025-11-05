@@ -183,19 +183,18 @@ def check_energy_card(conn, id: str):
         return id
 
     except mysql.connector.Error as err:
-        print(f"Error getting category_id: {err}")
-
+        error("Error checking energy card: %s", err)
         conn.rollback()
     finally:
-        cursor.close() 
-        
+        cursor.close()
+
 def check_trainer_card(conn, id: str):
     cursor = conn.cursor()
     try:
         cursor.execute(
             "SELECT id FROM trainer_card WHERE card_id = %s LIMIT 1",
             (id,)
-        )   
+        )
         res = cursor.fetchone()
         if cursor.rowcount == -1:
             return 0
@@ -203,19 +202,18 @@ def check_trainer_card(conn, id: str):
         return id
 
     except mysql.connector.Error as err:
-        print(f"Error getting category_id: {err}")
-
+        error("Error checking trainer card: %s", err)
         conn.rollback()
     finally:
         cursor.close()
-        
+
 def check_pokemon_card(conn, id: str):
     cursor = conn.cursor()
     try:
         cursor.execute(
             "SELECT id FROM pokemon_card WHERE card_id = %s LIMIT 1",
             (id,)
-        )   
+        )
         res = cursor.fetchone()
         if cursor.rowcount == -1:
             return 0
@@ -223,8 +221,7 @@ def check_pokemon_card(conn, id: str):
         return id
 
     except mysql.connector.Error as err:
-        print(f"Error getting category_id: {err}")
-
+        error("Error checking pokemon card: %s", err)
         conn.rollback()
     finally:
         cursor.close() 
@@ -254,7 +251,7 @@ def insert_card(conn, data: Card):
         return cursor.lastrowid
     
     except mysql.connector.Error as err:
-        print(f"Error creating card: {err}")
+        error("Error creating card: %s", err)
         conn.rollback()
         return None
 
@@ -306,7 +303,7 @@ def get_energy_card_id_by_slug(conn, slug: str):
         return res[0]
 
     except mysql.connector.Error as err:
-        print(f"Error getting energy card id: {err}")
+        error("Error getting energy card id: %s", err)
         return None
 
     finally:
@@ -316,7 +313,7 @@ def insert_energy_card(conn, slug: str, card_id: str, energy_type: str, langId: 
     # Check if energy card already exists
     existing_id = get_energy_card_id_by_slug(conn, slug)
     if existing_id is not None:
-        print(f"Energy card '{slug}' already exists with id: {existing_id}")
+        debug("Energy card '%s' already exists with id: %s", slug, existing_id)
         return existing_id
     
     cursor = conn.cursor()
@@ -335,7 +332,7 @@ def insert_energy_card(conn, slug: str, card_id: str, energy_type: str, langId: 
         return cursor.lastrowid
     
     except mysql.connector.Error as err:
-        print(f"Error creating energy card: {err}")
+        error("Error creating energy card: %s", err)
         conn.rollback()
         return None
 
@@ -356,7 +353,7 @@ def get_trainer_card_id_by_slug(conn, slug: str):
         return res[0]
 
     except mysql.connector.Error as err:
-        print(f"Error getting trainer card id: {err}")
+        error("Error getting trainer card id: %s", err)
         return None
 
     finally:
@@ -366,7 +363,7 @@ def insert_trainer_card(conn, slug: str, card_id: str):
     # Check if trainer card already exists
     existing_id = get_trainer_card_id_by_slug(conn, slug)
     if existing_id is not None:
-        print(f"Trainer card '{slug}' already exists with id: {existing_id}")
+        debug("Trainer card '%s' already exists with id: %s", slug, existing_id)
         return existing_id
     
     cursor = conn.cursor()
@@ -380,7 +377,7 @@ def insert_trainer_card(conn, slug: str, card_id: str):
         return cursor.lastrowid
     
     except mysql.connector.Error as err:
-        print(f"Error creating trainer card: {err}")
+        error("Error creating trainer card: %s", err)
         conn.rollback()
         return None
 
@@ -401,7 +398,7 @@ def get_pokemon_card_id_by_slug(conn, slug: str):
         return res[0]
 
     except mysql.connector.Error as err:
-        print(f"Error getting pokemon card id: {err}")
+        error("Error getting pokemon card id: %s", err)
         return None
 
     finally:
@@ -411,7 +408,7 @@ def insert_pokemon_card(conn, data: PokemonCard):
     # Check if pokemon card already exists
     existing_id = get_pokemon_card_id_by_slug(conn, data.id)
     if existing_id is not None:
-        print(f"Pokemon card '{data.id}' already exists with id: {existing_id}")
+        debug("Pokemon card '%s' already exists with id: %s", data.id, existing_id)
         return existing_id
     
     cursor = conn.cursor()
@@ -425,7 +422,7 @@ def insert_pokemon_card(conn, data: PokemonCard):
         return cursor.lastrowid
     
     except mysql.connector.Error as err:
-        print(f"Error creating pokemon card: {err}")
+        error("Error creating pokemon card: %s", err)
         conn.rollback()
         return None
 
@@ -450,9 +447,8 @@ def insert_pokemon_card_element(conn, pokemon_card_id: str, element: str, langId
 
 
     except mysql.connector.Error as err:
-        print(f"Error creating pokemon card element: {err}")
+        error("Error creating pokemon card element: %s", err)
         conn.rollback()
-
 
     finally:
         cursor.close()
@@ -466,13 +462,11 @@ def insert_card_variant(conn, card_id: str, variant: str):
         )
         # Valider les changements
         conn.commit()
-        return 
-
+        return
 
     except mysql.connector.Error as err:
-        print(f"Error creating pokemon card element: {err}")
+        error("Error creating card variant: %s", err)
         conn.rollback()
-
 
     finally:
         cursor.close()

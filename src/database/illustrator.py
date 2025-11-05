@@ -1,5 +1,6 @@
 import mysql.connector
 import uuid
+from ..utils.logger import debug, error
 
 class Illustrator:
     def __init__(self, name):
@@ -21,13 +22,12 @@ def get_illustrator_id(conn, data: Illustrator):
 
 
     except mysql.connector.Error as err:
-        print(f"Error creating illustrator: {err}")
+        error("Error getting illustrator: %s", err)
         conn.rollback()
-
 
     finally:
         cursor.close()
-        
+
 def insert_illustrator(conn, data: Illustrator):
     cursor = conn.cursor()
     try:
@@ -36,16 +36,14 @@ def insert_illustrator(conn, data: Illustrator):
             cursor.execute(
                 "INSERT INTO illustrator (name) VALUES (%s) ON DUPLICATE KEY UPDATE id=id",
                 (data.name,)
-            )   
+            )
             conn.commit()
-            id = get_illustrator_id(conn, data)        
+            id = get_illustrator_id(conn, data)
         return id
-    
-    
-    except mysql.connector.Error as err:
-        print(f"Error creating illustrator: {err}")
-        conn.rollback()
 
+    except mysql.connector.Error as err:
+        error("Error creating illustrator: %s", err)
+        conn.rollback()
 
     finally:
         cursor.close()

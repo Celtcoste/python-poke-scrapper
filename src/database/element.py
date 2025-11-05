@@ -1,4 +1,5 @@
 import mysql.connector
+from ..utils.logger import debug, error
 
 class Element:
     def __init__(self, name, image_uuid):
@@ -20,7 +21,7 @@ def get_element_id_by_name(conn, element_name: str, langId: str):
         return id
 
     except mysql.connector.Error as err:
-        print(f"Error getting category_id: {err}")
+        error("Error getting element_id: %s", err)
         conn.rollback()
 
     finally:

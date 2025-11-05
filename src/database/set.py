@@ -1,5 +1,6 @@
 import uuid
 import mysql.connector
+from ..utils.logger import debug, error
 
 def get_set_id_by_slug(conn, slug: str):
     """Get existing set ID by slug to handle duplicates"""
@@ -15,7 +16,7 @@ def get_set_id_by_slug(conn, slug: str):
         return res[0]
 
     except mysql.connector.Error as err:
-        print(f"Error getting set id: {err}")
+        error("Error getting set id: %s", err)
         return None
 
     finally:
@@ -35,7 +36,7 @@ def get_set_translation_id_by_slug(conn, slug: str):
         return res[0]
 
     except mysql.connector.Error as err:
-        print(f"Error getting set translation id: {err}")
+        error("Error getting set translation id: %s", err)
         return None
 
     finally:
@@ -60,7 +61,7 @@ def insert_set_translation(conn, data: SetTranslation):
     # Check if set translation already exists
     existing_id = get_set_translation_id_by_slug(conn, data.id)
     if existing_id is not None:
-        print(f"Set translation '{data.id}' already exists with id: {existing_id}")
+        debug("Set translation '%s' already exists with id: %s", data.id, existing_id)
         return existing_id
     
     cursor = conn.cursor()
@@ -74,7 +75,7 @@ def insert_set_translation(conn, data: SetTranslation):
         return cursor.lastrowid
 
     except mysql.connector.Error as err:
-        print(f"Error creating set translation: {err}")
+        error("Error creating set translation: %s", err)
         conn.rollback()
         return None
 
@@ -85,7 +86,7 @@ def insert_set(conn, data: Set):
     # Check if set already exists
     existing_id = get_set_id_by_slug(conn, data.id)
     if existing_id is not None:
-        print(f"Set '{data.id}' already exists with id: {existing_id}")
+        debug("Set '%s' already exists with id: %s", data.id, existing_id)
         return existing_id
     
     cursor = conn.cursor()
@@ -99,7 +100,7 @@ def insert_set(conn, data: Set):
         return cursor.lastrowid
 
     except mysql.connector.Error as err:
-        print(f"Error creating set: {err}")
+        error("Error creating set: %s", err)
         conn.rollback()
         return None
 

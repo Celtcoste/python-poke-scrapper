@@ -1,5 +1,6 @@
 import requests
 import time
+import re
 from enum import Enum
 from ..utils.logger import debug, info, error
 
@@ -8,7 +9,7 @@ from ..database.set import Set, SetTranslation, insert_set_translation, insert_s
 from ..database.illustrator import Illustrator, insert_illustrator
 from ..database.card import Card, PokemonCard, insert_card, insert_card_translation, insert_energy_card, insert_trainer_card, insert_pokemon_card, insert_pokemon_card_element, insert_card_variant, get_card_id, check_energy_card, check_trainer_card, check_pokemon_card
 from ..database.category import get_category_id_by_name
-from ..database.rarity import get_rarity_id_by_name, insert_card_rarity
+from ..database.rarity import get_rarity_id_by_name
 from ..database.pokemon import insert_pokemon_if_not_exist, get_pokemon_id_by_name
 
 def fetch_data(url):
@@ -18,6 +19,21 @@ def fetch_data(url):
     else:
         error("Failed to fetch data from %s", url)
         return None
+
+def clean_pokemon_name(card_name: str) -> str:
+    """
+    Extract base pokemon name from card name by removing variant suffixes.
+    Handles: -ex, -EX, -GX, ex, EX, GX, V, VMAX, VSTAR, etc.
+    """
+    # Pattern to match common pokemon card variants at the end of names
+    # Matches: -ex, -EX, -GX, ex, EX, GX, V, VMAX, VSTAR, BREAK, Prism Star, etc.
+    pattern = r'[\s\-]*(ex|EX|GX|V|VMAX|VSTAR|BREAK|Prism[\s\-]?Star|☆|★).*$'
+
+    # Remove variant suffixes
+    cleaned_name = re.sub(pattern, '', card_name).strip()
+
+    debug("Cleaned pokemon name: '%s' -> '%s'", card_name, cleaned_name)
+    return cleaned_name
     
     
 language_ids = {
@@ -106,7 +122,7 @@ def scrap_poke_data(connection, lang: str):
     debug("Blocs data: %s", blocs_data)
     if blocs_data:
         for bloc_position, bloc_data in enumerate(blocs_data, 1):
-            if bloc_data["id"] != "tcgp":
+            if bloc_data["id"] == "tcgp":
                 debug("Skipping bloc: %s", bloc_data["id"])
                 continue
             info("Scrapping bloc: %s", bloc_data["id"])
@@ -222,7 +238,8 @@ def scrap_poke_data(connection, lang: str):
                                 error("Trainer card data: slug='%s'", trainer_card_slug)
                                 error("Original card data: %s", card_data)
                         elif id_category == CATEGORY_IDS.get('POKEMON', -1):
-                            real_pokemon_name = card_data["name"].split('-ex')[0].split('-GX')[0].split(' ex')[0].split(' GX')[0].split('-EX')[0].split(' EX')[0].split(' V')
+                            # Use regex-based name cleaning instead of fragile string splitting
+                            real_pokemon_name = clean_pokemon_name(card_data["name"])
                             if card_data.get("dexId"):
                                 # Insert pokemon if not exists
                                 # Clean the slug format for pokemon translation
@@ -233,14 +250,29 @@ def scrap_poke_data(connection, lang: str):
                                     error("Pokemon data: slug='%s', name='%s'", pokemon_slug, card_data["name"])
                                     error("Original card data: %s", card_data)
                             else:
-                                dexId = get_pokemon_id_by_name(connection, card_data["name"].split(' ')[0], language_ids[lang])
-                                if dexId == 0:
-                                    if len(card_data["name"].split(' ')) > 1:
-                                        dexId = get_pokemon_id_by_name(connection, card_data["name"].split(' ')[1], language_ids[lang])
+                                # Try multiple strategies to find the pokemon
+                                dexId = 0
+
+                                # Strategy 1: Try first word of card name
+                                name_parts = card_data["name"].split(' ')
+                                if name_parts:
+                                    dexId = get_pokemon_id_by_name(connection, name_parts[0], language_ids[lang])
+
+                                # Strategy 2: Try second word if available
+                                if dexId == 0 and len(name_parts) > 1:
+                                    dexId = get_pokemon_id_by_name(connection, name_parts[1], language_ids[lang])
+
+                                # Strategy 3: Try cleaned pokemon name
                                 if dexId == 0:
                                     dexId = get_pokemon_id_by_name(connection, real_pokemon_name, language_ids[lang])
-                                    if dexId == 0:
-                                        dexId = input("Insert dexID for pokemon (" + card_data["name"] + " and " + card_data["id"]+ "): ")
+
+                                # If still not found, log error and skip this card
+                                if dexId == 0:
+                                    error("Could not determine dexId for pokemon card: '%s' (id: %s)", card_data["name"], card_data["id"])
+                                    error("Cleaned name: '%s'. Skipping this card.", real_pokemon_name)
+                                    error("Original card data: %s", card_data)
+                                    continue
+
                                 # Clean the slug format for pokemon translation
                                 pokemon_slug = f"pokemon/{dexId}/{lang}"
                                 pokemon_id = insert_pokemon_if_not_exist(connection, dexId, pokemon_slug, real_pokemon_name, language_ids[lang])
@@ -271,14 +303,10 @@ def scrap_poke_data(connection, lang: str):
                                     insert_pokemon_card_element(connection, pokemon_card_id, type, language_ids[lang])
                         else:
                             error("Invalid category: %s", id_category)
-                        
-                        # Add card rarity relationship
-                        rarity_result = insert_card_rarity(connection, card_id, card_data["rarity"])
-                        if rarity_result is None:
-                            error("Failed to create card rarity for card_id=%s with rarity='%s'", card_id, card_data["rarity"])
-                        else:
-                            debug("Successfully added rarity '%s' (rarity_id=%s) to card_id=%s", card_data["rarity"], rarity_result, card_id)
-                        
+
+                        # Note: Card rarity is already stored in card.rarity_id
+                        # No need for separate card_rarity table since cards have only one rarity
+
                         # Add card variants
                         if card_data["variants"]["firstEdition"] == True:
                             insert_card_variant(connection, card_id, "firstEdition")
