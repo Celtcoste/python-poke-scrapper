@@ -22,15 +22,25 @@ def fetch_data(url):
 
 def clean_pokemon_name(card_name: str) -> str:
     """
-    Extract base pokemon name from card name by removing variant suffixes.
-    Handles: -ex, -EX, -GX, ex, EX, GX, V, VMAX, VSTAR, etc.
+    Extract base pokemon name from card name by removing variant prefixes and suffixes.
+    Handles prefixes: Méga-, M-, M (Mega evolutions)
+    Handles suffixes: -ex, -EX, -GX, ex, EX, GX, V, VMAX, VSTAR, X, Y, etc.
     """
-    # Pattern to match common pokemon card variants at the end of names
-    # Matches: -ex, -EX, -GX, ex, EX, GX, V, VMAX, VSTAR, BREAK, Prism Star, etc.
-    pattern = r'[\s\-]*(ex|EX|GX|V|VMAX|VSTAR|BREAK|Prism[\s\-]?Star|☆|★).*$'
+    # First, remove Mega/M prefixes
+    # Matches: "Méga-", "Mega-", "M-", "M " at the start of the name
+    prefix_pattern = r'^(Méga[\s\-]|Mega[\s\-]|M[\s\-])'
+    cleaned_name = re.sub(prefix_pattern, '', card_name, flags=re.IGNORECASE).strip()
 
-    # Remove variant suffixes
-    cleaned_name = re.sub(pattern, '', card_name).strip()
+    # Then, remove variant suffixes
+    # Matches: -ex, -EX, -GX, ex, EX, GX, V, VMAX, VSTAR, BREAK, Prism Star, etc.
+    suffix_pattern = r'[\s\-]*(ex|EX|GX|V|VMAX|VSTAR|BREAK|Prism[\s\-]?Star|☆|★).*$'
+    cleaned_name = re.sub(suffix_pattern, '', cleaned_name).strip()
+
+    # Finally, remove single-letter variant indicators (X, Y, etc.) at the end
+    # Matches: " X", " Y", "-X", "-Y" at the end of the name
+    # Common for Mega evolutions like "Charizard X" or "Mewtwo Y"
+    variant_letter_pattern = r'[\s\-]+[XY]$'
+    cleaned_name = re.sub(variant_letter_pattern, '', cleaned_name, flags=re.IGNORECASE).strip()
 
     debug("Cleaned pokemon name: '%s' -> '%s'", card_name, cleaned_name)
     return cleaned_name
